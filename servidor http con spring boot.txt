@@ -1,0 +1,22 @@
+	@GetMapping("/pdf/{folder}/{fileName}")
+	public ResponseEntity<Resource> getPDFFile(@PathVariable String folder, @PathVariable String fileName) {
+	    String folderPath = "C://SW//workspace_chains//chains//chains_deployment//" + folder;
+	    Path filePath = Paths.get(folderPath, fileName + ".pdf");
+
+	    if (Files.exists(filePath) && Files.isRegularFile(filePath)) {
+	        try {
+	            ByteArrayResource resource = new ByteArrayResource(Files.readAllBytes(filePath));
+	            HttpHeaders headers = new HttpHeaders();
+	            headers.add(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=" + fileName + ".pdf");
+	            return ResponseEntity.ok()
+	                    .headers(headers)
+	                    .contentType(MediaType.APPLICATION_PDF)
+	                    .body(resource);
+	        } catch (IOException e) {
+	            e.printStackTrace();
+	            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+	        }
+	    } else {
+	        return ResponseEntity.notFound().build();
+	    }
+	}
